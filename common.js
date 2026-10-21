@@ -7,51 +7,11 @@ const fTime=fmt({hour:"2-digit",minute:"2-digit"}), fMonth=fmt({month:"long",yea
 const fShort=fmt({weekday:"short",day:"numeric",month:"short"}), fLong=fmt({weekday:"long",day:"numeric",month:"long"});
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
-// Controle van data.js: een ongeldig item wordt niet getoond, maar wel bovenaan de pagina gemeld,
-// zodat een typfout niet ongemerkt een deadline doet verdwijnen.
-function showProblems(title,lines){
-  const el=document.createElement("div");
-  el.className="problems"; el.setAttribute("role","alert");
-  el.innerHTML=`<b>${esc(title)}</b><ul>${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`;
-  (document.querySelector(".page")||document.body).prepend(el);
-  console.error(title,lines);
-}
-if(typeof ITEMS==="undefined"||typeof UNDATED==="undefined"||typeof COURSES==="undefined"){
-  showProblems("Fout in data.js",["Het bestand kon niet gelezen worden. Waarschijnlijk ontbreekt er ergens een komma, haakje of aanhalingsteken."]);
-  throw new Error("data.js niet geladen");
-}
-const HHMM=/^([01]\d|2[0-3]):[0-5]\d$/;
-function problemsOf(i){
-  const p=[], m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})$/.exec(i.d||"");
-  const dt=m&&new Date(+m[1],m[2]-1,+m[3]);
-  if(!m||!HHMM.test(m[4])||dt.getMonth()!==m[2]-1||dt.getDate()!==+m[3])p.push(`datum "${i.d}" bestaat niet (schrijf bv. 2026-10-29T23:59)`);
-  if(!COURSES[i.v])p.push(`vak "${i.v}" bestaat niet (kies uit ${Object.keys(COURSES).join(", ")})`);
-  if(!KIND[i.k])p.push(`soort "${i.k}" bestaat niet (kies uit ${Object.keys(KIND).join(", ")})`);
-  if(!i.t)p.push("titel ontbreekt");
-  if(i.e!==undefined&&(!HHMM.test(i.e)||(m&&i.e<=m[4])))p.push(`einduur "${i.e}" is ongeldig of ligt niet na het beginuur`);
-  return p;
-}
-const BAD=[];
-function valid(list,check,label){
-  return list.filter((i,n)=>{
-    const p=check(i);
-    if(p.length)BAD.push(`${label} ${n+1} (${i.t||"zonder titel"}): ${p.join("; ")}`);
-    return !p.length;
-  });
-}
-const ALL=valid(ITEMS,problemsOf,"ITEMS, item").map(i=>{
+const ALL=ITEMS.map(i=>{
   const dt=new Date(i.d), end=new Date(dt);
   if(i.e){const [h,m]=i.e.split(":");end.setHours(+h,+m,0,0);}
   return {...i,dt,end};
 }).sort((a,b)=>a.dt-b.dt);
-const TBD=valid(UNDATED,i=>[
-  ...(COURSES[i.v]?[]:[`vak "${i.v}" bestaat niet`]),
-  ...(KIND[i.k]?[]:[`soort "${i.k}" bestaat niet`]),
-  ...(i.t?[]:["titel ontbreekt"]),
-  ...(Array.isArray(i.li)?[]:["li moet een lijst zijn"]),
-],"UNDATED, item");
-if(BAD.length)showProblems("Fout in data.js: deze items worden niet getoond tot ze verbeterd zijn.",BAD);
-
 const isDue=i=>i.k==="deadline"||i.k==="examen";
 function daysUntil(dt){const a=new Date();a.setHours(0,0,0,0);const b=new Date(dt);b.setHours(0,0,0,0);return Math.round((b-a)/864e5);}
 function countLabel(n){if(n<0)return "voorbij";if(n===0)return "vandaag";if(n===1)return "morgen";return "nog "+n+" dagen";}

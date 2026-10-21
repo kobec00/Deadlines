@@ -183,7 +183,7 @@ footer p{margin:0 0 6px}
   .day,.row{break-inside:avoid}
 }
 
-/* agenda-knop, nagekeken-melding, datafouten */
+/* agenda-knop en nagekeken-melding */
 .pagehead{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px}
 .ghost{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:4px 0;font-size:.82rem;font-weight:600;color:var(--muted);white-space:nowrap;cursor:pointer}
 .ghost span{text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
@@ -191,8 +191,6 @@ footer p{margin:0 0 6px}
 .ghost:hover span{text-decoration-color:currentColor}
 .ghost svg{width:15px;height:15px;flex:none}
 .checked.stale{display:inline-block;margin-top:4px;padding:2px 8px;border-left:3px solid var(--warn-line);background:var(--warn-bg);color:var(--warn);font-weight:600}
-.problems{margin:20px 0 0;padding:12px 14px;border:2px solid var(--urgent);border-radius:6px;font-size:.88rem}
-.problems ul{margin:6px 0 0;padding-left:18px;color:var(--muted)}
 
 /* eenmalige tip: op beginscherm zetten */
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;padding:0 12px calc(12px + env(safe-area-inset-bottom));pointer-events:none}

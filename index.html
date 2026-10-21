@@ -136,7 +136,7 @@ function renderList(){
   if(state.past&&nPast&&!marked)html+=todayMarker();
   $("#list").innerHTML=html||`<p class="empty">Niets gepland in deze selectie.</p>`;
 
-  const tbd=state.show==="les"?[]:TBD.filter(inCourse);
+  const tbd=state.show==="les"?[]:UNDATED.filter(inCourse);
   $("#tbd").hidden=!tbd.length;
   $("#tbd-list").innerHTML=tbd.map(tbdRow).join("");
 }

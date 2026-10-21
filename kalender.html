@@ -118,8 +118,8 @@ function render(){
     :`<p class="empty">Geen ${state.les?"items":"deadlines of examens"} in ${fMonth.format(m)}.</p>`);
 
   const tbd=$("#tbdnote");
-  tbd.hidden=!TBD.length;
-  tbd.innerHTML=`Nog zonder datum: ${TBD.map(u=>`<b>${esc(u.t)}</b>`).join(", ")}. De details staan in de <a href="./#tbd">lijst</a>.`;
+  tbd.hidden=!UNDATED.length;
+  tbd.innerHTML=`Nog zonder datum: ${UNDATED.map(u=>`<b>${esc(u.t)}</b>`).join(", ")}. De details staan in de <a href="./#tbd">lijst</a>.`;
 }
 
 $("#months").addEventListener("click",e=>{
