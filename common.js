@@ -1,18 +1,60 @@
 // Gedeelde helpers voor index.html en kalender.html. De data zelf staat in data.js.
 const KIND={les:"les",deadline:"indienen",examen:"examen",opdracht:"opdracht"};
+const STALE_DAYS=14;
 const $=s=>document.querySelector(s);
 const fmt=o=>new Intl.DateTimeFormat("nl-BE",o);
-const fTime=fmt({hour:"2-digit",minute:"2-digit"}), fMonth=fmt({month:"long",year:"numeric"});
+const fTime=fmt({hour:"2-digit",minute:"2-digit"}), fMonth=fmt({month:"long",year:"numeric"}), fDate=fmt({day:"numeric",month:"long",year:"numeric"});
 const fShort=fmt({weekday:"short",day:"numeric",month:"short"}), fLong=fmt({weekday:"long",day:"numeric",month:"long"});
-const ALL=ITEMS.map(i=>{
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+// Controle van data.js: een ongeldig item wordt niet getoond, maar wel bovenaan de pagina gemeld,
+// zodat een typfout niet ongemerkt een deadline doet verdwijnen.
+function showProblems(title,lines){
+  const el=document.createElement("div");
+  el.className="problems"; el.setAttribute("role","alert");
+  el.innerHTML=`<b>${esc(title)}</b><ul>${lines.map(l=>`<li>${esc(l)}</li>`).join("")}</ul>`;
+  (document.querySelector(".page")||document.body).prepend(el);
+  console.error(title,lines);
+}
+if(typeof ITEMS==="undefined"||typeof UNDATED==="undefined"||typeof COURSES==="undefined"){
+  showProblems("Fout in data.js",["Het bestand kon niet gelezen worden. Waarschijnlijk ontbreekt er ergens een komma, haakje of aanhalingsteken."]);
+  throw new Error("data.js niet geladen");
+}
+const HHMM=/^([01]\d|2[0-3]):[0-5]\d$/;
+function problemsOf(i){
+  const p=[], m=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2})$/.exec(i.d||"");
+  const dt=m&&new Date(+m[1],m[2]-1,+m[3]);
+  if(!m||!HHMM.test(m[4])||dt.getMonth()!==m[2]-1||dt.getDate()!==+m[3])p.push(`datum "${i.d}" bestaat niet (schrijf bv. 2026-10-29T23:59)`);
+  if(!COURSES[i.v])p.push(`vak "${i.v}" bestaat niet (kies uit ${Object.keys(COURSES).join(", ")})`);
+  if(!KIND[i.k])p.push(`soort "${i.k}" bestaat niet (kies uit ${Object.keys(KIND).join(", ")})`);
+  if(!i.t)p.push("titel ontbreekt");
+  if(i.e!==undefined&&(!HHMM.test(i.e)||(m&&i.e<=m[4])))p.push(`einduur "${i.e}" is ongeldig of ligt niet na het beginuur`);
+  return p;
+}
+const BAD=[];
+function valid(list,check,label){
+  return list.filter((i,n)=>{
+    const p=check(i);
+    if(p.length)BAD.push(`${label} ${n+1} (${i.t||"zonder titel"}): ${p.join("; ")}`);
+    return !p.length;
+  });
+}
+const ALL=valid(ITEMS,problemsOf,"ITEMS, item").map(i=>{
   const dt=new Date(i.d), end=new Date(dt);
   if(i.e){const [h,m]=i.e.split(":");end.setHours(+h,+m,0,0);}
   return {...i,dt,end};
 }).sort((a,b)=>a.dt-b.dt);
+const TBD=valid(UNDATED,i=>[
+  ...(COURSES[i.v]?[]:[`vak "${i.v}" bestaat niet`]),
+  ...(KIND[i.k]?[]:[`soort "${i.k}" bestaat niet`]),
+  ...(i.t?[]:["titel ontbreekt"]),
+  ...(Array.isArray(i.li)?[]:["li moet een lijst zijn"]),
+],"UNDATED, item");
+if(BAD.length)showProblems("Fout in data.js: deze items worden niet getoond tot ze verbeterd zijn.",BAD);
+
 const isDue=i=>i.k==="deadline"||i.k==="examen";
 function daysUntil(dt){const a=new Date();a.setHours(0,0,0,0);const b=new Date(dt);b.setHours(0,0,0,0);return Math.round((b-a)/864e5);}
 function countLabel(n){if(n<0)return "voorbij";if(n===0)return "vandaag";if(n===1)return "morgen";return "nog "+n+" dagen";}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 const pad=n=>String(n).padStart(2,"0");
 const dayKey=dt=>`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
@@ -50,8 +92,64 @@ function dayBlock(d){
 }
 const todayMarker=()=>`<div class="today" role="separator">Vandaag · ${fShort.format(new Date())}</div>`;
 
-document.querySelectorAll(".checked").forEach(el=>{el.textContent=CHECKED;});
+// "Nagekeken op ..." met leeftijd. Na STALE_DAYS dagen wordt het een waarschuwing.
+(function(){
+  const dt=new Date(CHECKED+"T00:00"), age=-daysUntil(dt);
+  document.querySelectorAll(".checked").forEach(el=>{
+    if(isNaN(dt)){el.textContent="nagekeken op "+CHECKED;return;}
+    const when=fDate.format(dt);
+    if(age>STALE_DAYS){
+      el.classList.add("stale");
+      el.textContent=`Al ${age} dagen niet nagekeken (laatst op ${when}). Check zeker Toledo.`;
+    }else el.textContent=`nagekeken op ${when} (${age<=0?"vandaag":age===1?"gisteren":age+" dagen geleden"})`;
+  });
+})();
 
+// Agendabestand (.ics) met alle komende deadlines en examens, met herinneringen 3 dagen en 1 dag vooraf.
+const icsText=s=>String(s).replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+const icsUtc=d=>d.toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+const slug=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"").slice(0,40);
+function icsFold(line){
+  const enc=new TextEncoder();
+  let out="",cur="",len=0;
+  for(const ch of line){
+    const b=enc.encode(ch).length;
+    if(len+b>(out?74:75)){out+=(out?"\r\n ":"")+cur;cur="";len=0;}
+    cur+=ch;len+=b;
+  }
+  return out?out+"\r\n "+cur:cur;
+}
+function buildICS(){
+  const stamp=icsUtc(new Date());
+  const alarm=(t,trigger)=>["BEGIN:VALARM","ACTION:DISPLAY",`DESCRIPTION:${icsText(t)}`,`TRIGGER:${trigger}`,"END:VALARM"];
+  const lines=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//STUWER Ortho//Deadlines 2026-27//NL","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Deadlines STUWER Ortho 26-27"];
+  for(const i of ALL.filter(i=>isDue(i)&&daysUntil(i.dt)>=0)){
+    const c=COURSES[i.v].abbr;
+    lines.push("BEGIN:VEVENT",
+      `UID:${i.d.replace(/\D/g,"")}-${i.v}-${slug(i.t)}@stuwer-ortho-deadlines`,
+      `DTSTAMP:${stamp}`,
+      i.noTime?`DTSTART;VALUE=DATE:${dayKey(i.dt).replace(/-/g,"")}`:`DTSTART:${icsUtc(i.dt)}`,
+      `SUMMARY:${icsText(i.k==="deadline"?`${c} indienen: ${i.t}`:`${c}: ${i.t}`)}`,
+      `DESCRIPTION:${icsText([i.p,i.n&&"Let op: "+i.n,"Onofficieel overzicht. Check altijd Toledo."].filter(Boolean).join("\n\n"))}`,
+      ...(i.r?[`LOCATION:${icsText(i.r)}`]:[]),
+      ...alarm(i.t,"-P3D"),...alarm(i.t,"-P1D"),
+      "END:VEVENT");
+  }
+  lines.push("END:VCALENDAR");
+  return lines.map(icsFold).join("\r\n")+"\r\n";
+}
+const icsBtn=$("#ics");
+if(icsBtn)icsBtn.addEventListener("click",()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([buildICS()],{type:"text/calendar;charset=utf-8"}));
+  a.download="deadlines-stuwer-ortho.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  const label=icsBtn.querySelector("span"), old=label.textContent;
+  label.textContent="Gedownload ✓"; setTimeout(()=>{label.textContent=old;},3000);
+});
+
+// Thema
 const root=document.documentElement, mq=matchMedia("(prefers-color-scheme: dark)");
 const theme=()=>root.getAttribute("data-theme")||(mq.matches?"dark":"light");
 function themeLabel(){$("#theme").textContent=theme()==="dark"?"Licht thema":"Donker thema";}
@@ -61,3 +159,45 @@ $("#theme").addEventListener("click",()=>{
 });
 if(mq.addEventListener)mq.addEventListener("change",themeLabel);
 themeLabel();
+
+// Eenmalige tip om de site op het beginscherm te zetten, met uitleg voor iOS of Android.
+(function(){
+  const ua=navigator.userAgent;
+  const ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1), android=/Android/.test(ua);
+  const standalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+  if(!(ios||android)||standalone)return;
+  try{if(localStorage.getItem("installTip"))return;}catch(e){return;}
+
+  let deferred=null;
+  addEventListener("beforeinstallprompt",e=>{
+    e.preventDefault(); deferred=e;
+    const b=$("#sheet-install"); if(b)b.hidden=false;
+  });
+  const share=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M7 10H5v11h14V10h-2"/></svg>`;
+  const steps=ios
+    ?[`Tik op het deel-icoon ${share} (in Safari onderaan, op een iPad bovenaan).`,"Scroll naar beneden en kies <b>Zet op beginscherm</b>.","Tik rechtsboven op <b>Voeg toe</b>."]
+    :["Tik rechtsboven op het menu <b>⋮</b>.","Kies <b>App installeren</b> of <b>Toevoegen aan startscherm</b>.","Bevestig met <b>Installeren</b> of <b>Toevoegen</b>."];
+  const fine=ios?"Lukt het niet? Open de site dan eerst in Safari.":"Gebruik je Samsung Internet? Kies dan in het menu ≡ voor <b>Pagina toevoegen aan</b> → <b>Startscherm</b>.";
+
+  setTimeout(()=>{
+    try{localStorage.setItem("installTip","1");}catch(e){return;}
+    const el=document.createElement("div");
+    el.className="sheet"; el.setAttribute("role","dialog"); el.setAttribute("aria-labelledby","sheet-t");
+    el.innerHTML=`<div class="sheet-in">
+      <button class="sheet-x" type="button" aria-label="Sluiten">×</button>
+      <div class="label">Tip</div>
+      <h2 id="sheet-t">Zet deze site op je beginscherm</h2>
+      <p>Dan open je je deadlines met één tik, net als een app.</p>
+      <ol>${steps.map(s=>`<li><span>${s}</span></li>`).join("")}</ol>
+      <p class="fine">${fine}</p>
+      <div class="sheet-act"><button class="btn primary" id="sheet-install" type="button"${deferred?"":" hidden"}>Installeren</button><button class="btn" id="sheet-ok" type="button">Begrepen</button></div>
+    </div>`;
+    document.body.appendChild(el);
+    const close=()=>{el.remove();removeEventListener("keydown",onKey);};
+    const onKey=e=>{if(e.key==="Escape")close();};
+    addEventListener("keydown",onKey);
+    el.querySelector(".sheet-x").addEventListener("click",close);
+    $("#sheet-ok").addEventListener("click",close);
+    $("#sheet-install").addEventListener("click",async()=>{if(deferred){deferred.prompt();await deferred.userChoice;deferred=null;}close();});
+  },1500);
+})();
