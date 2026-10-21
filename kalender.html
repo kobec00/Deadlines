@@ -21,7 +21,9 @@
 <script>
 try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}
 // Bij een paginawissel met view transition: geen gewone fade-in, de overgang doet het werk.
-addEventListener("pagereveal",function(e){if(!e.viewTransition)return;var r=document.documentElement;r.classList.add("nav-vt","no-enter");e.viewTransition.finished.finally(function(){r.classList.remove("nav-vt")})});
+// Naar een anker (bv. ./#tbd) springt de pagina toch, dus dan geen overgang.
+// Thema opnieuw lezen: een vooraf geladen (prerender) pagina kan intussen een ander thema gekregen hebben.
+addEventListener("pagereveal",function(e){var r=document.documentElement;try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")r.setAttribute("data-theme",t)}catch(x){}if(window.themeLabel)themeLabel();if(!e.viewTransition)return;if(location.hash){e.viewTransition.skipTransition();return}r.classList.add("nav-vt","no-enter");e.viewTransition.finished.finally(function(){r.classList.remove("nav-vt")})});
 </script>
 <script type="speculationrules">{"prerender":[{"urls":["./"],"eagerness":"moderate"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,8 +128,9 @@ function render(fx){
   const days=groupByDay(vis), list=$("#mlist");
   list.classList.toggle("anim",!!fx);
   list.innerHTML=`<h2 class="month">Details ${fMonth.format(m)}</h2>`+(days.length
-    ?days.map((d,i)=>dayBlock(d,i+1)).join("")
+    ?days.map(d=>dayBlock(d)).join("")
     :`<p class="empty">Geen ${state.les?"items":"deadlines of examens"} in ${fMonth.format(m)}.</p>`);
+  if(fx)stagger(list);
 
   const tbd=$("#tbdnote");
   tbd.hidden=!UNDATED.length;

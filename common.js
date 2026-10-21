@@ -44,13 +44,13 @@ function groupByDay(items){
   }
   return days;
 }
-function dayBlock(d,i=0){
+function dayBlock(d){
   const n=daysUntil(d.dt), soon=n>=0&&n<=7&&d.items.some(isDue);
-  return `<section class="day${n<0?" past":""}" id="d-${d.key}" style="--i:${Math.min(i,12)}">
+  return `<section class="day${n<0?" past":""}" id="d-${d.key}">
     <header class="dh"><span>${fLong.format(d.dt)}</span><span class="rel${soon?" soon":""}">${countLabel(n)}</span></header>
     ${d.items.map(row).join("")}</section>`;
 }
-const todayMarker=(i=0)=>`<div class="today" role="separator" style="--i:${Math.min(i,12)}">Vandaag · ${fShort.format(new Date())}</div>`;
+const todayMarker=()=>`<div class="today" role="separator">Vandaag · ${fShort.format(new Date())}</div>`;
 
 // Animatiehulpjes. Bij "minder beweging" (systeeminstelling) zet style.css alles stil.
 const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
@@ -65,6 +65,12 @@ function syncSeg(seg,animate){
 const syncAllSegs=()=>document.querySelectorAll(".seg").forEach(s=>syncSeg(s,false));
 addEventListener("resize",syncAllSegs);
 if(document.fonts)document.fonts.ready.then(syncAllSegs);
+// Gespreide binnenkomst, geteld vanaf het eerste blok dat in beeld is (niet vanaf de top van de lijst),
+// zodat je na filteren terwijl je gescrold bent niet naar een lege plek kijkt.
+function stagger(list){
+  let j=0;
+  for(const el of list.children)el.style.setProperty("--i",el.getBoundingClientRect().bottom<0?0:Math.min(j++,12));
+}
 // Speel een CSS-animatieklasse (opnieuw) af.
 function replay(el,cls){
   el.classList.remove("in-next","in-prev","chips-in");
@@ -72,8 +78,13 @@ function replay(el,cls){
   el.classList.add(cls);
 }
 // Klik op het tabblad waar je al bent: niets doen in plaats van de pagina te herladen.
-document.querySelectorAll('.tabs a[aria-current="page"]').forEach(a=>a.addEventListener("click",e=>e.preventDefault()));
-if(document.documentElement.dataset.page==="lijst")$(".brand").addEventListener("click",e=>{e.preventDefault();scrollTo({top:0,behavior:reduceMotion.matches?"auto":"smooth"});});
+// Ctrl/Cmd/Shift-klik blijft gewoon een nieuw tabblad of venster openen.
+const plainClick=e=>e.button===0&&!(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey);
+document.querySelectorAll('.tabs a[aria-current="page"]').forEach(a=>a.addEventListener("click",e=>{if(plainClick(e))e.preventDefault();}));
+if(document.documentElement.dataset.page==="lijst")$(".brand").addEventListener("click",e=>{
+  if(!plainClick(e))return;
+  e.preventDefault();scrollTo({top:0,behavior:reduceMotion.matches?"auto":"smooth"});
+});
 
 // "Nagekeken op ..." met leeftijd. Na STALE_DAYS dagen wordt het een waarschuwing.
 (function(){
@@ -165,7 +176,7 @@ themeLabel();
   const fine=ios?"Lukt het niet? Open de site dan eerst in Safari.":"Gebruik je Samsung Internet? Kies dan in het menu ≡ voor <b>Pagina toevoegen aan</b> → <b>Startscherm</b>.";
 
   const show=()=>{
-    try{localStorage.setItem("installTip","1");}catch(e){return;}
+    try{if(localStorage.getItem("installTip"))return;localStorage.setItem("installTip","1");}catch(e){return;}
     const el=document.createElement("div");
     el.className="sheet"; el.setAttribute("role","dialog"); el.setAttribute("aria-labelledby","sheet-t");
     el.innerHTML=`<div class="sheet-in">
