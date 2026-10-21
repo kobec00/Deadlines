@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalender · Deadlines STUWER Ortho 26-27</title>
+<meta name="description" content="Maandkalender met de deadlines en examens voor F&amp;EH, DSH en SO&amp;I (STUWER Orthopedagogie, UCLL Hasselt, 2026-2027).">
+<meta property="og:title" content="Kalender · STUWER Ortho 26-27">
+<meta property="og:description" content="Alle deadlines en examens voor F&amp;EH, DSH en SO&amp;I in een maandoverzicht.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="nl_BE">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b1a20'/%3E%3Crect x='14' y='18' width='36' height='32' rx='5' fill='none' stroke='%23fff' stroke-width='4'/%3E%3Cpath d='M14 29h36M24 12v10M40 12v10' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./">STUWER Ortho <span>· semester 1 · 2026–27</span></a>
+    <nav class="tabs" aria-label="Weergave">
+      <a href="./">Lijst</a>
+      <a href="kalender.html" aria-current="page">Kalender</a>
+    </nav>
+    <button class="theme" id="theme" type="button" aria-label="Wissel tussen licht en donker thema"></button>
+  </div>
+</header>
+
+<div class="wrap page">
+  <div class="pagehead">
+    <h1>Kalender</h1>
+    <p class="sub">Deadlines en examens per maand · nagekeken op <span class="checked"></span>.</p>
+  </div>
+
+  <div class="calbar">
+    <div class="seg" id="months" role="group" aria-label="Kies een maand"></div>
+    <button class="chip" id="les" type="button" aria-pressed="false"><span class="box"></span>Lessen tonen</button>
+  </div>
+
+  <div class="calhead">
+    <h2 id="mtitle"></h2>
+    <span class="stats" id="mstats"></span>
+  </div>
+  <div class="legend" aria-hidden="true">
+    <span><i class="lg deadline"></i>Indienen</span>
+    <span><i class="lg examen"></i>Examen</span>
+    <span><i class="lg les"></i>Les</span>
+    <span class="sep"></span>
+    <span class="feh"><i class="sq"></i>F&amp;EH</span>
+    <span class="dsh"><i class="sq"></i>DSH</span>
+    <span class="soi"><i class="sq"></i>SO&amp;I</span>
+    <span class="tip">Tik op een dag om de details te zien.</span>
+  </div>
+  <div class="cal" id="cal"></div>
+
+  <main id="mlist"></main>
+  <p class="tbdnote" id="tbdnote" hidden></p>
+
+  <footer>
+    <p>Bronnen: het lesrooster in TimeEdit (uren en lokalen van de lessen), de planningsdocumenten, het F&amp;EH-werkboek en de exameninfo van 2026-27, plus de agenda (Einddatums) op Toledo.</p>
+    <p>Dit is een onofficieel overzicht. Bij verschillen geldt altijd wat op Toledo staat of wat de docent zegt.</p>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const fMon=fmt({month:"short"});
+const months=[];
+for(let d=new Date(ALL[0].dt.getFullYear(),ALL[0].dt.getMonth(),1),last=ALL[ALL.length-1].dt;d<=last;d=new Date(d.getFullYear(),d.getMonth()+1,1))months.push(d);
+const now=new Date(), cur=months.findIndex(m=>m.getFullYear()===now.getFullYear()&&m.getMonth()===now.getMonth());
+const state={m:cur>=0?cur:now<months[0]?0:months.length-1,les:false};
+const shown=i=>state.les||i.k!=="les";
+const inMonth=(i,m)=>i.dt.getFullYear()===m.getFullYear()&&i.dt.getMonth()===m.getMonth();
+const plural=(n,one,more)=>n+" "+(n===1?one:more);
+
+const chip=i=>`<span class="ce ${i.v} k-${i.k}" title="${esc(`${COURSES[i.v].abbr} · ${KIND[i.k]} · ${i.t}`)}"><span class="ct">${i.noTime?"":`<span class="t">${fTime.format(i.dt)}</span> `}<b>${esc(COURSES[i.v].abbr)}</b> ${esc(i.t)}</span></span>`;
+
+function render(){
+  const m=months[state.m], y=m.getFullYear(), mo=m.getMonth();
+  $("#months").innerHTML=months.map((x,k)=>`<button type="button" data-m="${k}" aria-pressed="${k===state.m}">${esc(cap(fMon.format(x)))}${x.getFullYear()!==months[0].getFullYear()?` <span class="n">${x.getFullYear()}</span>`:""}</button>`).join("");
+  $("#les").setAttribute("aria-pressed",state.les);
+
+  const items=ALL.filter(i=>inMonth(i,m)), cnt=k=>items.filter(i=>i.k===k).length;
+  $("#mtitle").textContent=cap(fMonth.format(m));
+  $("#mstats").textContent=[plural(cnt("deadline"),"deadline","deadlines"),plural(cnt("examen"),"examen","examens"),plural(cnt("les"),"les","lessen")].join(" · ");
+
+  const vis=items.filter(shown), byDay={};
+  for(const i of vis)(byDay[dayKey(i.dt)]||(byDay[dayKey(i.dt)]=[])).push(i);
+  const offset=(new Date(y,mo,1).getDay()+6)%7, len=new Date(y,mo+1,0).getDate(), total=Math.ceil((offset+len)/7)*7, today=dayKey(new Date());
+  let html=["ma","di","wo","do","vr","za","zo"].map(w=>`<div class="wd">${w}</div>`).join("");
+  for(let k=0;k<total;k++){
+    const dt=new Date(y,mo,1-offset+k), key=dayKey(dt), out=dt.getMonth()!==mo, evs=out?[]:byDay[key]||[];
+    const cls=`cell${out?" out":""}${key===today?" is-today":""}${k%7>4?" we":""}${!out&&daysUntil(dt)<0?" past":""}`;
+    const inner=`<span class="cn">${dt.getDate()}</span>${evs.map(chip).join("")}`;
+    html+=evs.length
+      ?`<a class="${cls}" href="#d-${key}" aria-label="${esc(cap(fLong.format(dt))+": "+evs.map(i=>KIND[i.k]+" "+COURSES[i.v].abbr+", "+i.t).join("; "))}">${inner}</a>`
+      :`<div class="${cls}">${inner}</div>`;
+  }
+  $("#cal").innerHTML=html;
+
+  const days=groupByDay(vis);
+  $("#mlist").innerHTML=`<h2 class="month">Details ${fMonth.format(m)}</h2>`+(days.length
+    ?days.map(dayBlock).join("")
+    :`<p class="empty">Geen ${state.les?"items":"deadlines of examens"} in ${fMonth.format(m)}.</p>`);
+
+  const tbd=$("#tbdnote");
+  tbd.hidden=!UNDATED.length;
+  tbd.innerHTML=`Nog zonder datum: ${UNDATED.map(u=>`<b>${esc(u.t)}</b>`).join(", ")}. De details staan in de <a href="./#tbd">lijst</a>.`;
+}
+
+$("#months").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  state.m=+b.dataset.m; render();
+});
+$("#les").addEventListener("click",()=>{state.les=!state.les;render();});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
+render();
+</script>
+</body>
+</html>

@@ -9,156 +9,32 @@
 <meta property="og:description" content="Alle indienmomenten, lessen en examens voor F&amp;EH, DSH en SO&amp;I op één plek.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="nl_BE">
-<meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#131217" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b1a20'/%3E%3Crect x='14' y='18' width='36' height='32' rx='5' fill='none' stroke='%23fff' stroke-width='4'/%3E%3Cpath d='M14 29h36M24 12v10M40 12v10' stroke='%23fff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
 <script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
-  --bg:#f6f4ef; --surface:#ffffff; --ink:#1b1a20; --muted:#625f6c; --line:#e5e1d8;
-  --feh:#7444c8; --feh-bg:#f1ebfb;
-  --dsh:#c4522a; --dsh-bg:#fcece4;
-  --soi:#17735d; --soi-bg:#e3f3ee;
-  --warn:#8a5a0c; --warn-bg:#fdf3dc;
-  --urgent:#c42d2d;
-  --shadow:0 1px 2px rgba(20,18,30,.04),0 4px 14px rgba(20,18,30,.05);
-  color-scheme:light;
-}
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --bg:#131217; --surface:#1c1b22; --ink:#ecebf0; --muted:#a3a0ad; --line:#2d2b35;
-    --feh:#b597f0; --feh-bg:#2a2340;
-    --dsh:#f0916a; --dsh-bg:#3a2520;
-    --soi:#5fcaa8; --soi-bg:#173229;
-    --warn:#f0c46a; --warn-bg:#352c1b;
-    --urgent:#ff7b7b;
-    --shadow:none;
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#131217; --surface:#1c1b22; --ink:#ecebf0; --muted:#a3a0ad; --line:#2d2b35;
-  --feh:#b597f0; --feh-bg:#2a2340;
-  --dsh:#f0916a; --dsh-bg:#3a2520;
-  --soi:#5fcaa8; --soi-bg:#173229;
-  --warn:#f0c46a; --warn-bg:#352c1b;
-  --urgent:#ff7b7b;
-  --shadow:none;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.wrap{max-width:820px;margin:0 auto;padding:32px 16px 64px}
-.eyebrow{font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-
-/* header */
-.head{display:flex;justify-content:space-between;align-items:center;gap:16px}
-h1{font-family:Fraunces,Georgia,serif;font-weight:700;font-size:clamp(2rem,6vw,3rem);line-height:1.05;letter-spacing:-.02em;margin:8px 0 6px}
-.sub{margin:0;color:var(--muted)}
-.checked{margin:10px 0 0;font-size:.84rem;color:var(--muted);max-width:62ch}
-.theme{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:.8rem;padding:6px 12px;border-radius:999px;cursor:pointer}
-.theme:hover{color:var(--ink)}
-
-/* eerstvolgende deadline + volgende les */
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:28px}
-.sum{position:relative;overflow:hidden;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px 16px 22px;box-shadow:var(--shadow)}
-.sum::before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--c,var(--line))}
-.sum .big{margin:8px 0 2px;font-size:2rem;font-weight:800;line-height:1.1;letter-spacing:-.035em;color:var(--c);font-variant-numeric:tabular-nums}
-.sum .big small{font-size:.95rem;font-weight:600;letter-spacing:0;color:var(--muted)}
-.sum .ttl{margin:4px 0 8px;font-size:1.05rem;font-weight:600;line-height:1.3}
-.sum .after{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);font-size:.84rem;color:var(--muted)}
-.sum .meta{margin-bottom:12px}
-.sum .after b{color:var(--ink);font-weight:600}
-.sum .none{margin:8px 0 0;color:var(--muted)}
-.nw{white-space:nowrap}
-
-/* filters */
-.filters{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 12px;margin:36px 0 0;padding:10px 0}
-.seg{display:inline-flex;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
-.seg button{border:0;background:none;padding:6px 14px;border-radius:999px;font-size:.87rem;font-weight:500;color:var(--muted);white-space:nowrap;cursor:pointer}
-.seg button:hover{color:var(--ink)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:6px 12px;font-size:.87rem;font-weight:500;cursor:pointer}
-.chip:hover{color:var(--ink)}
-.chip[aria-pressed="true"]{border-color:var(--c);background:var(--cbg);color:var(--ink);font-weight:600}
-.chip.all[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
-.dot{width:9px;height:9px;border-radius:50%;background:var(--c);flex:none}
-.pastbtn{display:block;margin:4px 0 0;padding:4px 0;background:none;border:0;color:var(--muted);font-size:.85rem;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.pastbtn:hover{color:var(--ink)}
-
-/* planning */
-.month{display:flex;align-items:center;gap:10px;margin:30px 0 6px;font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.month::after{content:"";flex:1;height:1px;background:var(--line)}
-.day{margin:14px 0 20px}
-.day.past{opacity:.5}
-.dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin:0 0 8px;font-size:1rem;font-weight:700;letter-spacing:-.01em}
-.dayhead .dl{display:inline-block}
-.dayhead .dl::first-letter{text-transform:uppercase}
-.rel{font-size:.8rem;font-weight:600;letter-spacing:0;color:var(--muted);white-space:nowrap}
-.rel.soon{color:var(--urgent)}
-.ev{min-width:0;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:12px;padding:11px 14px;box-shadow:var(--shadow)}
-.ev+.ev{margin-top:8px}
-.ev.k-les,.ev.tbd{background:transparent;box-shadow:none}
-.ev.tbd{border-style:dashed;border-left-style:solid;margin:8px 0}
-.ev h4{margin:6px 0 0;font-size:1rem;line-height:1.35;font-weight:600}
-.ev p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
-.ev ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:.9rem}
-.ev li+li{margin-top:3px}
-.meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-size:.84rem;color:var(--muted)}
-.tag{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--cbg);color:var(--c)}
-.kind{font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:999px;color:var(--muted)}
-.kind.les{padding:2px 0}
-.kind.deadline{background:var(--ink);color:var(--bg)}
-.kind.examen{box-shadow:inset 0 0 0 1.5px var(--ink);color:var(--ink)}
-.kind.opdracht{box-shadow:inset 0 0 0 1px var(--line)}
-.note{display:flex;gap:8px;margin-top:10px!important;background:var(--warn-bg);color:var(--warn)!important;padding:7px 10px;border-radius:8px;font-size:.84rem!important;line-height:1.45}
-.note::before{content:"!";flex:none;display:grid;place-items:center;width:16px;height:16px;margin-top:2px;border-radius:50%;background:var(--warn);color:var(--warn-bg);font-size:.68rem;font-weight:800}
-.today{display:flex;align-items:center;gap:10px;margin:24px 0 8px;color:var(--urgent);font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-.today::after{content:"";flex:1;height:2px;border-radius:2px;background:var(--urgent)}
-.empty{color:var(--muted);text-align:center;padding:28px 0}
-.feh{--c:var(--feh);--cbg:var(--feh-bg)} .dsh{--c:var(--dsh);--cbg:var(--dsh-bg)} .soi{--c:var(--soi);--cbg:var(--soi-bg)}
-
-footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted)}
-footer p{margin:0 0 6px}
-
-@media (min-width:700px){
-  .filters{position:sticky;top:0;z-index:5;background:var(--bg)}
-}
-@media (max-width:640px){
-  .wrap{padding-top:24px}
-  .summary{grid-template-columns:1fr;margin-top:22px}
-  .sum{padding:14px 16px 14px 20px}
-  .sum .big{font-size:1.7rem;margin-top:6px}
-  .seg{display:flex;width:100%}
-  .seg button{flex:1;padding:6px 8px}
-}
-@media (max-width:380px){
-  .xl{display:none}
-}
-@media print{
-  .theme,.filters,.pastbtn{display:none!important}
-  .sum,.ev{box-shadow:none}
-  .day,.ev{break-inside:avoid}
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="head">
-      <div class="eyebrow">STUWER Orthopedagogie · UCLL Hasselt</div>
-      <button class="theme" id="theme" type="button" aria-label="Wissel tussen licht en donker thema"></button>
-    </div>
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="./">STUWER Ortho <span>· semester 1 · 2026–27</span></a>
+    <nav class="tabs" aria-label="Weergave">
+      <a href="./" aria-current="page">Lijst</a>
+      <a href="kalender.html">Kalender</a>
+    </nav>
+    <button class="theme" id="theme" type="button" aria-label="Wissel tussen licht en donker thema"></button>
+  </div>
+</header>
+
+<div class="wrap page">
+  <div class="pagehead">
     <h1>Deadlines, lessen &amp; examens</h1>
-    <p class="sub">Semester 1 · academiejaar 2026–2027</p>
-    <p class="checked">Laatst nagekeken op 21 oktober 2026, aan de hand van het lesrooster (TimeEdit), de planningsdocumenten en Toledo. Twijfel je? Check altijd Toledo.</p>
-  </header>
+    <p class="sub">F&amp;EH, DSH en SO&amp;I · UCLL Hasselt · nagekeken op <span class="checked"></span> via TimeEdit, de planningsdocumenten en Toledo.</p>
+  </div>
 
   <div class="summary">
     <section class="sum" id="next-due" aria-live="polite"></section>
@@ -166,10 +42,10 @@ footer p{margin:0 0 6px}
   </div>
 
   <nav class="filters" aria-label="Filters">
-    <div class="seg" role="group" aria-label="Wat wil je zien?">
-      <button type="button" data-show="all" aria-pressed="true">Alles</button>
-      <button type="button" data-show="due" aria-pressed="false">Deadlines<span class="xl"> &amp; examens</span></button>
-      <button type="button" data-show="les" aria-pressed="false">Lessen</button>
+    <div class="seg" id="show" role="group" aria-label="Wat wil je zien?">
+      <button type="button" data-show="all">Alles <span class="n"></span></button>
+      <button type="button" data-show="due"><span>Deadlines<span class="xl"> &amp; examens</span></span> <span class="n"></span></button>
+      <button type="button" data-show="les">Lessen <span class="n"></span></button>
     </div>
     <div class="chips" id="chips" role="group" aria-label="Filter op vak"></div>
   </nav>
@@ -178,8 +54,8 @@ footer p{margin:0 0 6px}
   <main id="list"></main>
 
   <section id="tbd" hidden>
-    <h2 class="month">Nog geen datum bekend</h2>
-    <div id="tbd-list"></div>
+    <h2 class="month">Nog geen datum</h2>
+    <div class="day"><header class="dh"><span>Datum nog niet bekend</span></header><div id="tbd-list"></div></div>
   </section>
 
   <footer>
@@ -188,142 +64,77 @@ footer p{margin:0 0 6px}
   </footer>
 </div>
 
+<script src="data.js"></script>
+<script src="common.js"></script>
 <script>
-// d = start, e = einduur (lessen), r = lokaal, p = uitleg, n = opgelet-melding.
-const SOI_TBC="Het lesrooster vermeldt geen programma. Volgens de SO&I-planning komen er nog een sessie ‘leren pitchen’ en een sessie proefpresentaties.";
-const ITEMS = [
-  {d:"2026-10-08T17:00", e:"21:30", v:"feh", k:"les", t:"Filosofisch & ethisch handelen", r:"STH 1.07"},
-  {d:"2026-10-15T16:00", e:"19:00", v:"soi", k:"les", t:"Sociaal ondernemen & innoveren", r:"STH 0.07"},
-  {d:"2026-10-22T17:00", e:"20:30", v:"feh", k:"les", t:"Werksessie Ethisch Dilemma, stap 1–3", r:"STH 1.07", p:"Lees vooraf het ‘stappenplan Ethisch Dilemma’ (Toledo, Leermateriaal)."},
-  {d:"2026-10-29T17:00", e:"20:30", v:"dsh", k:"les", t:"Les + feedbackmoment over je boekkeuze", r:"STH 1.07", p:"Thema's: superdiversiteit, armoede, racisme/discriminatie.", n:"Het planningsdocument zegt lokaal A1.16 en start om 17u10. Het lesrooster zegt STH 1.07 vanaf 17:00."},
-  {d:"2026-10-29T23:59", v:"dsh", k:"deadline", t:"Titel van je gekozen boek", p:"Opdracht ‘titel keuze van je boek’ op Toledo."},
-  {d:"2026-11-11T23:59", v:"feh", k:"deadline", t:"Casus Ethisch Dilemma", p:"Opdracht ‘Casus Ethisch Dilemma’ op Toledo.", n:"Deze deadline staat alleen op Toledo en niet in het planningsdocument."},
-  {d:"2026-11-12T17:00", e:"21:30", v:"feh", k:"les", t:"Werksessie Ethisch Dilemma, stap 4–7", r:"STH 1.07"},
-  {d:"2026-11-19T17:00", e:"20:30", v:"soi", k:"les", t:"Sociaal ondernemen & innoveren", r:"STH 1.07", p:SOI_TBC},
-  {d:"2026-12-03T17:00", e:"20:00", v:"dsh", k:"les", t:"Maatschappelijke realiteit + implementatie van de concepten", r:"STH 1.07", n:"Nog te bevestigen. Volgens de planning was deze les op 26/11 (18u30–21u30, A1.13), maar in het lesrooster staat 26/11 niet meer en staat de DSH-les op 3/12."},
-  {d:"2026-12-10T16:00", e:"17:00", v:"feh", k:"les", t:"Info & algemeenheden: Taal en ICT", r:"STH 0.02", p:"Gezamenlijke sessie voor meerdere vakken, waaronder F&EH. Met Karen De Loenen en Greet van der Wielen."},
-  {d:"2026-12-10T17:00", e:"19:00", v:"feh", k:"les", t:"Responsiecollege: presentaties Ethisch Dilemma", r:"STH 1.07", n:"In de planning staat dit nog ‘onder voorbehoud’."},
-  {d:"2026-12-10T19:30", e:"21:30", v:"dsh", k:"les", t:"Responsiecollege (vragen over de leerstof)", r:"STH 1.07", p:"Bereid je vragen voor, want hier wordt ook het mondeling examen toegelicht."},
-  {d:"2026-12-17T17:00", e:"20:30", v:"soi", k:"les", t:"Sociaal ondernemen & innoveren", r:"STH 1.08", p:SOI_TBC},
-  {d:"2026-12-24T12:00", v:"dsh", k:"deadline", t:"Opdracht boek (30%)", p:"Max. 3 pagina's: samenvatting (1 A4), kritische bespreking (max. 2 A4) en 2 stellingen.", n:"De deadline is om 12:00 's middags, niet om middernacht."},
-  {d:"2027-01-06T23:59", v:"feh", k:"deadline", t:"Eindportfolio Ethisch Dilemma (per groep)", p:"Eén persoon per groep dient in en mailt daarna de docent en de andere groepsleden."},
-  {d:"2027-01-06T23:59", v:"feh", k:"deadline", t:"Werkje over Verhaeghe", p:"Je vragen over ‘Over normaliteit en andere afwijkingen’, max. 2 A4.", n:"Staat in het werkboek, maar op Toledo is hiervoor nog geen aparte indienmap."},
-  {d:"2027-01-12T09:45", v:"dsh", k:"examen", t:"Mondeling examen DSH (dag 1)", p:"Max. 20 min per persoon. Je tijdslot vind je in ‘Volgorde examen DSH’ op Toledo."},
-  {d:"2027-01-14T09:00", v:"feh", k:"examen", t:"Examen F&EH: 14/01 of 21/01", noTime:true, p:"Mogelijk komen er extra momenten op 12/01 en/of 19/01.", n:"Het planningsdocument zegt ‘mondeling’, het werkboek zegt ‘schriftelijk’ (meerkeuze + open vragen). Vraag dit na bij de docent."},
-  {d:"2027-01-14T16:30", v:"dsh", k:"examen", t:"Mondeling examen DSH (dag 2)", p:"Max. 20 min per persoon. Je tijdslot vind je in ‘Volgorde examen DSH’ op Toledo."},
-];
-// Items zonder datum. De bullets zijn bewust HTML (voor <em>/<strong>).
-const UNDATED = [
-  {v:"soi", k:"examen", t:"Examen: groepspitch + persoonlijke reflectie (filmpje)", li:[
-    "Pitch over je small business project (10 punten) en een persoonlijke reflectie als filmpje of ingesproken ppt (10 punten).",
-    "Indienen via de map <em>Examen</em> op Toledo. De einddatum daar staat nog op 22/01/<strong>2026</strong>, dus die is van vorig jaar en nog niet aangepast.",
-    "De duur van de pitch is onduidelijk: de richtlijnen (versie 24-25) zeggen max. 10 min, het document van sessie 3 zegt max. 15 min.",
-    "Volgens de planning komen er nog een sessie \"leren pitchen\" en een sessie proefpresentaties. In het lesrooster staan nog SO&amp;I-lessen op 19/11 en 17/12."]},
-  {v:"dsh", k:"opdracht", t:"Digitale oefening ZIEDET", li:[
-    "Staat in de planning tussen de lessen van 29/10 en 26/11 (die les staat in het lesrooster nu op 3/12), zonder vaste deadline."]},
-];
-const COURSES={
-  feh:{abbr:"F&EH",name:"Filosofisch & ethisch handelen"},
-  dsh:{abbr:"DSH",name:"Divers-sensitief handelen"},
-  soi:{abbr:"SO&I",name:"Sociaal ondernemen & innoveren"},
-};
-const KIND={les:"les",deadline:"indienen",examen:"examen",opdracht:"opdracht"};
 const state={course:"all",show:"all",past:false};
-const $=s=>document.querySelector(s);
-const fmt=o=>new Intl.DateTimeFormat("nl-BE",o);
-const fTime=fmt({hour:"2-digit",minute:"2-digit"}), fMonth=fmt({month:"long",year:"numeric"});
-const fShort=fmt({weekday:"short",day:"numeric",month:"short"}), fLong=fmt({weekday:"long",day:"numeric",month:"long"});
-const ALL=ITEMS.map(i=>{
-  const dt=new Date(i.d), end=new Date(dt);
-  if(i.e){const [h,m]=i.e.split(":");end.setHours(+h,+m,0,0);}
-  return {...i,dt,end};
-}).sort((a,b)=>a.dt-b.dt);
-const isDue=i=>i.k==="deadline"||i.k==="examen";
 const inCourse=i=>state.course==="all"||i.v===state.course;
-const inShow=i=>state.show==="all"||(state.show==="les")===(i.k==="les");
-function daysUntil(dt){const a=new Date();a.setHours(0,0,0,0);const b=new Date(dt);b.setHours(0,0,0,0);return Math.round((b-a)/864e5);}
-function countLabel(n){if(n<0)return "voorbij";if(n===0)return "vandaag";if(n===1)return "morgen";return "nog "+n+" dagen";}
-function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));}
-function timeLabel(i){
-  if(i.noTime)return "";
-  const s=fTime.format(i.dt);
-  if(i.e)return s+"–"+i.e;
-  return i.k==="deadline"?"tegen "+s:i.k==="examen"?"vanaf "+s:s;
-}
-const tag=v=>`<span class="tag">${esc(COURSES[v].abbr)}</span>`;
-const kind=k=>`<span class="kind ${k}">${KIND[k]}</span>`;
-const details=(...xs)=>xs.filter(Boolean).map(esc).join(" · ");
+const inShow=(i,s=state.show)=>s==="all"||(s==="les")===(i.k==="les");
 
 function renderSum(el,label,list,none){
   const [a,b]=list;
-  if(!a){el.className="sum";el.innerHTML=`<div class="eyebrow">${label}</div><p class="none">${none}</p>`;return;}
-  const n=daysUntil(a.dt), now=new Date();
-  const big=n===0?(a.k==="les"&&a.dt<=now?"Nu bezig":"Vandaag"):n===1?"Morgen":`<small>nog</small> ${n} <small>dagen</small>`;
+  if(!a){el.className="sum";el.innerHTML=`<div></div><div><div class="label">${label}</div><p class="s-none">${none}</p></div>`;return;}
+  const n=daysUntil(a.dt);
+  const [num,unit]=a.k==="les"&&a.dt<=new Date()?["NU","bezig"]:[n,n===0?"vandaag":n===1?"morgen":"dagen"];
   el.className="sum "+a.v;
-  el.innerHTML=`<div class="eyebrow">${typeof label==="function"?label(a):label}</div>
-    <div class="big">${big}</div>
-    <div class="ttl">${esc(a.t)}</div>
-    <div class="meta">${tag(a.v)}<span>${details(fShort.format(a.dt),timeLabel(a),a.r)}</span></div>
-    ${b?`<div class="after">Daarna: <b>${esc(b.t)}</b> · ${esc(COURSES[b.v].abbr)} · <span class="nw">${fShort.format(b.dt)}</span></div>`:""}`;
+  el.innerHTML=`<div class="cd"><b>${num}</b><span class="label">${unit}</span></div>
+    <div><div class="label">${label}</div>
+      <div class="s-ttl">${esc(a.t)}</div>
+      <div class="s-meta">${badge(a.v)}<span>${details(fShort.format(a.dt),timeLabel(a),a.r)}</span></div></div>
+    ${b?`<div class="s-after">Daarna: <b>${esc(b.t)}</b> · ${esc(COURSES[b.v].abbr)} · <span class="nw">${fShort.format(b.dt)}</span></div>`:""}`;
 }
 
 function renderSummary(){
-  const now=new Date();
-  renderSum($("#next-due"),a=>a.k==="examen"?"Eerstvolgend examen":"Eerstvolgende deadline",ALL.filter(i=>isDue(i)&&i.dt>now),"Geen deadlines of examens meer.");
+  const now=new Date(), due=ALL.filter(i=>isDue(i)&&i.dt>now);
+  renderSum($("#next-due"),due[0]&&due[0].k==="examen"?"Volgend examen":"Volgende deadline",due,"Geen deadlines of examens meer.");
   renderSum($("#next-les"),"Volgende les",ALL.filter(i=>i.k==="les"&&i.end>now),"Geen lessen meer dit semester.");
 }
 
 function renderFilters(){
-  document.querySelectorAll(".seg button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.show===state.show));
+  const upcoming=ALL.filter(inCourse).filter(i=>daysUntil(i.dt)>=0);
+  document.querySelectorAll("#show button").forEach(b=>{
+    b.setAttribute("aria-pressed",b.dataset.show===state.show);
+    b.querySelector(".n").textContent=upcoming.filter(i=>inShow(i,b.dataset.show)).length;
+  });
   $("#chips").innerHTML=[["all","Alle vakken"],...Object.entries(COURSES).map(([k,c])=>[k,c.abbr,c.name])].map(([k,label,name])=>
-    `<button type="button" class="chip ${k}" data-c="${k}" aria-pressed="${state.course===k}"${name?` title="${esc(name)}"`:""}>${k==="all"?"":`<i class="dot"></i>`}${esc(label)}</button>`
+    `<button type="button" class="chip ${k}" data-c="${k}" aria-pressed="${state.course===k}"${name?` title="${esc(name)}"`:""}>${k==="all"?"":`<i class="sq"></i>`}${esc(label)}</button>`
   ).join("");
 }
 
-const card=i=>`<article class="ev ${i.v} k-${i.k}">
-  <div class="meta">${tag(i.v)}${kind(i.k)}<span>${details(timeLabel(i),i.r)}</span></div>
-  <h4>${esc(i.t)}</h4>${i.p?`<p>${esc(i.p)}</p>`:""}${i.n?`<p class="note">${esc(i.n)}</p>`:""}
+const tbdRow=u=>`<article class="row ${u.v} k-${u.k}">
+  <div class="r-time">datum n.t.b.</div>
+  <div class="r-main"><div class="r-tags">${badge(u.v)}${kind(u.k)}</div>
+    <h4>${esc(u.t)}</h4><ul>${u.li.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+  <div class="r-room"></div>
 </article>`;
 
 function renderList(){
-  const sel=ALL.filter(inCourse).filter(inShow);
+  const sel=ALL.filter(inCourse).filter(i=>inShow(i));
   const nPast=sel.filter(i=>daysUntil(i.dt)<0).length;
   const items=state.past?sel:sel.filter(i=>daysUntil(i.dt)>=0);
   const btn=$("#past");
   btn.hidden=!nPast;
   btn.textContent=state.past?"Verberg voorbije items":`Toon ${nPast} voorbij${nPast===1?" item":"e items"}`;
 
-  const days=[];
-  for(const i of items){
-    const last=days[days.length-1];
-    if(last&&last.key===i.dt.toDateString())last.items.push(i);
-    else days.push({key:i.dt.toDateString(),dt:i.dt,items:[i]});
-  }
-  const marker=`<div class="today" role="separator">Vandaag · ${fShort.format(new Date())}</div>`;
   let html="",month="",marked=false;
-  for(const d of days){
+  for(const d of groupByDay(items)){
     const n=daysUntil(d.dt);
-    if(state.past&&nPast&&!marked&&n>=0){html+=marker;marked=true;}
+    if(state.past&&nPast&&!marked&&n>=0){html+=todayMarker();marked=true;}
     const m=fMonth.format(d.dt);
     if(m!==month){html+=`<h2 class="month">${m}</h2>`;month=m;}
-    const soon=n>=0&&n<=7&&d.items.some(isDue);
-    html+=`<section class="day${n<0?" past":""}">
-      <h3 class="dayhead"><span class="dl">${fLong.format(d.dt)}</span><span class="rel${soon?" soon":""}">${countLabel(n)}</span></h3>
-      ${d.items.map(card).join("")}</section>`;
+    html+=dayBlock(d);
   }
-  if(state.past&&nPast&&!marked)html+=marker;
+  if(state.past&&nPast&&!marked)html+=todayMarker();
   $("#list").innerHTML=html||`<p class="empty">Niets gepland in deze selectie.</p>`;
 
   const tbd=state.show==="les"?[]:UNDATED.filter(inCourse);
   $("#tbd").hidden=!tbd.length;
-  $("#tbd-list").innerHTML=tbd.map(u=>`<article class="ev tbd ${u.v}">
-    <div class="meta">${tag(u.v)}${kind(u.k)}<span>datum nog niet bekend</span></div>
-    <h4>${esc(u.t)}</h4><ul>${u.li.map(x=>`<li>${x}</li>`).join("")}</ul></article>`).join("");
+  $("#tbd-list").innerHTML=tbd.map(tbdRow).join("");
 }
 
 function render(){renderSummary();renderFilters();renderList();}
 
-document.querySelector(".seg").addEventListener("click",e=>{
+$("#show").addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b)return;
   state.show=b.dataset.show; renderFilters(); renderList();
 });
@@ -334,16 +145,6 @@ $("#chips").addEventListener("click",e=>{
 $("#past").addEventListener("click",()=>{state.past=!state.past;renderList();});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
 render();
-
-const root=document.documentElement, mq=matchMedia("(prefers-color-scheme: dark)");
-const theme=()=>root.getAttribute("data-theme")||(mq.matches?"dark":"light");
-function themeLabel(){$("#theme").textContent=theme()==="dark"?"☀︎ Licht":"☾ Donker";}
-$("#theme").addEventListener("click",()=>{
-  const t=theme()==="dark"?"light":"dark"; root.setAttribute("data-theme",t);
-  try{localStorage.setItem("theme",t)}catch(e){} themeLabel();
-});
-if(mq.addEventListener)mq.addEventListener("change",themeLabel);
-themeLabel();
 </script>
 </body>
 </html>
