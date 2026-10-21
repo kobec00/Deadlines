@@ -44,13 +44,36 @@ function groupByDay(items){
   }
   return days;
 }
-function dayBlock(d){
+function dayBlock(d,i=0){
   const n=daysUntil(d.dt), soon=n>=0&&n<=7&&d.items.some(isDue);
-  return `<section class="day${n<0?" past":""}" id="d-${d.key}">
+  return `<section class="day${n<0?" past":""}" id="d-${d.key}" style="--i:${Math.min(i,12)}">
     <header class="dh"><span>${fLong.format(d.dt)}</span><span class="rel${soon?" soon":""}">${countLabel(n)}</span></header>
     ${d.items.map(row).join("")}</section>`;
 }
-const todayMarker=()=>`<div class="today" role="separator">Vandaag · ${fShort.format(new Date())}</div>`;
+const todayMarker=(i=0)=>`<div class="today" role="separator" style="--i:${Math.min(i,12)}">Vandaag · ${fShort.format(new Date())}</div>`;
+
+// Animatiehulpjes. Bij "minder beweging" (systeeminstelling) zet style.css alles stil.
+const reduceMotion=matchMedia("(prefers-reduced-motion: reduce)");
+// Zet het schuivende blokje van een .seg onder de actieve knop.
+function syncSeg(seg,animate){
+  const b=seg&&seg.querySelector('[aria-pressed="true"]'); if(!b)return;
+  if(!animate)seg.classList.add("no-anim");
+  seg.style.setProperty("--x",b.offsetLeft+"px");
+  seg.style.setProperty("--w",b.offsetWidth+"px");
+  if(!animate){void seg.offsetWidth;seg.classList.remove("no-anim");}
+}
+const syncAllSegs=()=>document.querySelectorAll(".seg").forEach(s=>syncSeg(s,false));
+addEventListener("resize",syncAllSegs);
+if(document.fonts)document.fonts.ready.then(syncAllSegs);
+// Speel een CSS-animatieklasse (opnieuw) af.
+function replay(el,cls){
+  el.classList.remove("in-next","in-prev","chips-in");
+  void el.offsetWidth;
+  el.classList.add(cls);
+}
+// Klik op het tabblad waar je al bent: niets doen in plaats van de pagina te herladen.
+document.querySelectorAll('.tabs a[aria-current="page"]').forEach(a=>a.addEventListener("click",e=>e.preventDefault()));
+if(document.documentElement.dataset.page==="lijst")$(".brand").addEventListener("click",e=>{e.preventDefault();scrollTo({top:0,behavior:reduceMotion.matches?"auto":"smooth"});});
 
 // "Nagekeken op ..." met leeftijd. Na STALE_DAYS dagen wordt het een waarschuwing.
 (function(){
@@ -114,8 +137,10 @@ const root=document.documentElement, mq=matchMedia("(prefers-color-scheme: dark)
 const theme=()=>root.getAttribute("data-theme")||(mq.matches?"dark":"light");
 function themeLabel(){$("#theme").textContent=theme()==="dark"?"Licht thema":"Donker thema";}
 $("#theme").addEventListener("click",()=>{
-  const t=theme()==="dark"?"light":"dark"; root.setAttribute("data-theme",t);
-  try{localStorage.setItem("theme",t)}catch(e){} themeLabel();
+  const t=theme()==="dark"?"light":"dark";
+  const apply=()=>{root.setAttribute("data-theme",t);themeLabel();};
+  try{localStorage.setItem("theme",t)}catch(e){}
+  if(document.startViewTransition&&!reduceMotion.matches)document.startViewTransition(apply);else apply();
 });
 if(mq.addEventListener)mq.addEventListener("change",themeLabel);
 themeLabel();
@@ -139,7 +164,7 @@ themeLabel();
     :["Tik rechtsboven op het menu <b>⋮</b>.","Kies <b>App installeren</b> of <b>Toevoegen aan startscherm</b>.","Bevestig met <b>Installeren</b> of <b>Toevoegen</b>."];
   const fine=ios?"Lukt het niet? Open de site dan eerst in Safari.":"Gebruik je Samsung Internet? Kies dan in het menu ≡ voor <b>Pagina toevoegen aan</b> → <b>Startscherm</b>.";
 
-  setTimeout(()=>{
+  const show=()=>{
     try{localStorage.setItem("installTip","1");}catch(e){return;}
     const el=document.createElement("div");
     el.className="sheet"; el.setAttribute("role","dialog"); el.setAttribute("aria-labelledby","sheet-t");
@@ -153,11 +178,19 @@ themeLabel();
       <div class="sheet-act"><button class="btn primary" id="sheet-install" type="button"${deferred?"":" hidden"}>Installeren</button><button class="btn" id="sheet-ok" type="button">Begrepen</button></div>
     </div>`;
     document.body.appendChild(el);
-    const close=()=>{el.remove();removeEventListener("keydown",onKey);};
+    const close=()=>{
+      removeEventListener("keydown",onKey);
+      if(reduceMotion.matches){el.remove();return;}
+      el.classList.add("out");
+      setTimeout(()=>el.remove(),220);
+    };
     const onKey=e=>{if(e.key==="Escape")close();};
     addEventListener("keydown",onKey);
     el.querySelector(".sheet-x").addEventListener("click",close);
     $("#sheet-ok").addEventListener("click",close);
     $("#sheet-install").addEventListener("click",async()=>{if(deferred){deferred.prompt();await deferred.userChoice;deferred=null;}close();});
-  },1500);
+  };
+  // Een vooraf geladen (prerender) pagina toont de tip pas als je ze echt opent.
+  const start=()=>setTimeout(show,1500);
+  if(document.prerendering)document.addEventListener("prerenderingchange",start,{once:true});else start();
 })();

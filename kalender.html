@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-page="kalender">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,7 +10,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="nl_BE">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#242529" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
@@ -18,7 +18,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Deadlines">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script>
+try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}
+// Bij een paginawissel met view transition: geen gewone fade-in, de overgang doet het werk.
+addEventListener("pagereveal",function(e){if(!e.viewTransition)return;var r=document.documentElement;r.classList.add("nav-vt","no-enter");e.viewTransition.finished.finally(function(){r.classList.remove("nav-vt")})});
+</script>
+<script type="speculationrules">{"prerender":[{"urls":["./"],"eagerness":"moderate"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -30,7 +35,7 @@
     <a class="brand" href="./">STUWER Ortho <span>· semester 1 · 2026–27</span></a>
     <nav class="tabs" aria-label="Weergave">
       <a href="./">Lijst</a>
-      <a href="kalender.html" aria-current="page">Kalender</a>
+      <a href="kalender.html" aria-current="page">Kalender<span class="ind" aria-hidden="true"></span></a>
     </nav>
     <button class="theme" id="theme" type="button" aria-label="Wissel tussen licht en donker thema"></button>
   </div>
@@ -89,9 +94,13 @@ const plural=(n,one,more)=>n+" "+(n===1?one:more);
 
 const chip=i=>`<span class="ce ${i.v} k-${i.k}" title="${esc(`${COURSES[i.v].abbr} · ${KIND[i.k]} · ${i.t}`)}"><span class="ct">${i.noTime?"":`<span class="t">${fTime.format(i.dt)}</span> `}<b>${esc(COURSES[i.v].abbr)}</b> ${esc(i.t)}</span></span>`;
 
-function render(){
+$("#months").innerHTML=months.map((x,k)=>`<button type="button" data-m="${k}">${esc(cap(fMon.format(x)))}${x.getFullYear()!==months[0].getFullYear()?` <span class="n">${x.getFullYear()}</span>`:""}</button>`).join("");
+
+// fx: "next"/"prev" = maandwissel (raster schuift), "les" = lessen aan/uit, leeg = zonder animatie.
+function render(fx){
   const m=months[state.m], y=m.getFullYear(), mo=m.getMonth();
-  $("#months").innerHTML=months.map((x,k)=>`<button type="button" data-m="${k}" aria-pressed="${k===state.m}">${esc(cap(fMon.format(x)))}${x.getFullYear()!==months[0].getFullYear()?` <span class="n">${x.getFullYear()}</span>`:""}</button>`).join("");
+  document.querySelectorAll("#months button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.m===state.m));
+  syncSeg($("#months"),!!fx);
   $("#les").setAttribute("aria-pressed",state.les);
 
   const items=ALL.filter(i=>inMonth(i,m)), cnt=k=>items.filter(i=>i.k===k).length;
@@ -111,10 +120,13 @@ function render(){
       :`<div class="${cls}">${inner}</div>`;
   }
   $("#cal").innerHTML=html;
+  if(fx==="next"||fx==="prev"){replay($("#cal"),"in-"+fx);replay($(".calhead"),"in-"+fx);}
+  else if(fx==="les")replay($("#cal"),"chips-in");
 
-  const days=groupByDay(vis);
-  $("#mlist").innerHTML=`<h2 class="month">Details ${fMonth.format(m)}</h2>`+(days.length
-    ?days.map(dayBlock).join("")
+  const days=groupByDay(vis), list=$("#mlist");
+  list.classList.toggle("anim",!!fx);
+  list.innerHTML=`<h2 class="month">Details ${fMonth.format(m)}</h2>`+(days.length
+    ?days.map((d,i)=>dayBlock(d,i+1)).join("")
     :`<p class="empty">Geen ${state.les?"items":"deadlines of examens"} in ${fMonth.format(m)}.</p>`);
 
   const tbd=$("#tbdnote");
@@ -123,10 +135,11 @@ function render(){
 }
 
 $("#months").addEventListener("click",e=>{
-  const b=e.target.closest("button"); if(!b)return;
-  state.m=+b.dataset.m; render();
+  const b=e.target.closest("button"); if(!b||+b.dataset.m===state.m)return;
+  const dir=+b.dataset.m>state.m?"next":"prev";
+  state.m=+b.dataset.m; render(dir);
 });
-$("#les").addEventListener("click",()=>{state.les=!state.les;render();});
+$("#les").addEventListener("click",()=>{state.les=!state.les;render("les");});
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)render();});
 render();
 </script>
