@@ -23,7 +23,9 @@ try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")document.docu
 // Bij een paginawissel met view transition: geen gewone fade-in, de overgang doet het werk.
 // Naar een anker (bv. ./#tbd) springt de pagina toch, dus dan geen overgang.
 // Thema opnieuw lezen: een vooraf geladen (prerender) pagina kan intussen een ander thema gekregen hebben.
-addEventListener("pagereveal",function(e){var r=document.documentElement;try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")r.setAttribute("data-theme",t)}catch(x){}if(window.themeLabel)themeLabel();if(!e.viewTransition)return;if(location.hash){e.viewTransition.skipTransition();return}r.classList.add("nav-vt","no-enter");e.viewTransition.finished.finally(function(){r.classList.remove("nav-vt")})});
+// Wie gescrold is, krijgt een gewone crossfade: anders zwiepen balk en pagina verticaal mee.
+addEventListener("pageswap",function(e){document.documentElement.classList.toggle("vt-flat",scrollY>40)});
+addEventListener("pagereveal",function(e){var r=document.documentElement;r.classList.toggle("vt-flat",scrollY>40);try{var t=localStorage.getItem("theme");if(t==="dark"||t==="light")r.setAttribute("data-theme",t)}catch(x){}if(window.themeLabel)themeLabel();if(!e.viewTransition)return;if(location.hash){e.viewTransition.skipTransition();return}r.classList.add("nav-vt","no-enter");e.viewTransition.finished.finally(function(){r.classList.remove("nav-vt")})});
 </script>
 <script type="speculationrules">{"prerender":[{"urls":["./"],"eagerness":"moderate"}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -124,6 +126,7 @@ function render(fx){
   $("#cal").innerHTML=html;
   if(fx==="next"||fx==="prev"){replay($("#cal"),"in-"+fx);replay($(".calhead"),"in-"+fx);}
   else if(fx==="les")replay($("#cal"),"chips-in");
+  else $("#cal").classList.remove("chips-in");
 
   const days=groupByDay(vis), list=$("#mlist");
   list.classList.toggle("anim",!!fx);

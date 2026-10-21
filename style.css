@@ -34,8 +34,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-u
 a{color:inherit}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.seg button:focus-visible{outline:2px solid currentColor;outline-offset:-5px}
+a.cell:focus-visible{outline-offset:-2px}
 .wrap{max-width:960px;margin:0 auto;padding:0 16px}
 main.wrap,.page{padding-bottom:64px}
+.page{overflow-x:clip}
 .label{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .nw{white-space:nowrap}
 .feh{--c:var(--feh)} .dsh{--c:var(--dsh)} .soi{--c:var(--soi)}
@@ -105,6 +108,7 @@ h1{margin:0;font-size:clamp(1.55rem,4.5vw,2.1rem);font-weight:800;line-height:1.
 .month{margin:32px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--ink);font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
 .day{margin:10px 0;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;scroll-margin-top:16px}
 .day:target{animation:flash 1.6s var(--ease)}
+@media (prefers-reduced-motion:reduce),(forced-colors:active){.day:target{outline:2px solid var(--ink);outline-offset:2px}}
 .day.past{opacity:.55}
 .dh{display:flex;justify-content:space-between;gap:12px;padding:7px 14px;background:var(--subtle);border-bottom:1px solid var(--line);font:600 .76rem/1.4 var(--mono);letter-spacing:.03em;text-transform:uppercase}
 .dh .rel{color:var(--muted);white-space:nowrap}
@@ -224,6 +228,7 @@ footer p{margin:0 0 6px}
 .tabs .ind{view-transition-name:tab-ind}
 .page{view-transition-name:page;animation:rise .4s var(--ease)}
 .no-enter .page{animation:none}
+.vt-flat .topbar,.vt-flat .tabs .ind,.vt-flat .page{view-transition-name:none}
 ::view-transition-group(*){animation-duration:.4s;animation-timing-function:var(--ease)}
 .nav-vt[data-page="kalender"]::view-transition-old(page){animation:.14s cubic-bezier(.4,0,1,1) both out-left}
 .nav-vt[data-page="kalender"]::view-transition-new(page){animation:.3s var(--ease) .1s both in-right}
